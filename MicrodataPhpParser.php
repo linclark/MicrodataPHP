@@ -1,20 +1,21 @@
 <?php
-require_once('simplehtmldom/simple_html_dom.php');
+
 /**
  * Defines a parser for extracting microdata items from HTML.
  */
 class MicrodataPhpParser {
   protected $url;
-  protected $dom;
   public $xpath;
 
   public function __construct($url) {
     $this->url = $url;
-    $dom = new DOMDocument;
+    $dom = new DOMDocument($url);
+    // Use a custom class for DOMElements so that we can use Microdata DOM API
+    // functions on them.
+    $dom->registerNodeClass('DOMElement', 'MicrodataPhpDomElement');
     $dom->preserveWhiteSpace = false;
     @$dom->loadHTMLFile($this->url);
-    $this->dom = $dom;
-    $this->xpath = new DOMXPath($this->dom);
+    $this->xpath = new DOMXPath($dom);
   }
 
   public function json() {
@@ -34,85 +35,13 @@ class MicrodataPhpParser {
     return $this->xpath->query('//*[@itemscope]');
   }
 
-  public function itemScope($item) {
-    return $item->hasAttribute('itemscope');
-  }
-
-  public function itemtype($item) {
-    $itemtype = $item->getAttribute('itemtype');
-    if (!empty($itemtype)) {
-      return $itemtype;
-    }
-    return FALSE;
-  }
-
-  public function itemid($item) {
-    $itemid = $item->getAttribute('itemid');
-    if (!empty($itemid)) {
-      return $itemid;
-    }
-    return FALSE;
-  }
-
-  public function itemref($item) {
-    $itemref = $item->getAttribute('itemref');
-    if (!empty($itemref)) {
-      return $this->tokenList($itemref);
-    }
-    return array();
-  }
-
-  public function itemProp($item) {
-    $itemprop = $item->getAttribute('itemprop');
-    if (!empty($itemprop)) {
-      return $this->tokenList($itemprop);
-    }
-    return array();
-  }
-
-  public function itemValue($item) {
-    $itemprop = $this->itemProp($item);
-    if (empty($itemprop))
-      return null;
-    if ($this->itemScope($item)) {
-      return $item;
-    }
-    switch (strtoupper($item->tagName)) {
-      case 'META':
-        return $item->getAttribute('content');
-      case 'AUDIO':
-      case 'EMBED':
-      case 'IFRAME':
-      case 'IMG':
-      case 'SOURCE':
-      case 'TRACK':
-      case 'VIDEO':
-        // @todo Should this test resolve?
-        return $item->getAttribute('src');
-      case 'A':
-      case 'AREA':
-      case 'LINK':
-        // @todo Should this test resolve?
-        return $item->getAttribute('href');
-      case 'OBJECT':
-        // @todo Should this test resolve?
-        return $item->getAttribute('data');
-      case 'TIME':
-        $datetime = $item->getAttribute('datetime');
-        if (!empty($datetime))
-          return $datetime;
-      default:
-        return $item->textContent;
-    }
-  }
-
   public function properties($root) {
     $props = array();
 
-    if ($this->itemScope($root)) {
+    if ($root->itemScope()) {
       $toTraverse = array($root);
 
-      foreach ($this->itemref($root) as $itemref) {
+      foreach ($root->itemRef() as $itemref) {
         //@todo Implement itemref support.
       }
       while (count($toTraverse)) {
@@ -142,12 +71,12 @@ class MicrodataPhpParser {
       }
     }
     if (!$root->isSameNode($node)) {
-      $names = $this->itemProp($node);
+      $names = $node->itemProp();
       if (count($names)) {
         //@todo Add support for property name filtering.
         $props[] = $node;
       }
-      if ($this->itemScope($node)) {
+      if ($node->itemScope()) {
         return;
       }
     }
@@ -167,16 +96,16 @@ class MicrodataPhpParser {
       $result->properties = array();
   
       // Add itemtype.
-      if ($itemtype = $this->itemtype($item)) {
+      if ($itemtype = $item->itemType()) {
         $result->type = $itemtype;
       }
       // Add itemid. 
-      if ($itemid = $this->itemid($item)) {
+      if ($itemid = $item->itemid()) {
         $result->id = $itemid;
       }
       // Add properties.
       foreach ($this->properties($item) as $elem) {
-        if ($this->itemScope($elem)) {
+        if ($elem->itemScope()) {
           if (in_array($elem, $memory)) {
             $value = 'ERROR';
           }
@@ -187,9 +116,9 @@ class MicrodataPhpParser {
           }
         }
         else {
-          $value = $this->itemValue($elem);
+          $value = $elem->itemValue();
         }
-        foreach ($this->itemProp($elem) as $prop) {
+        foreach ($elem->itemProp() as $prop) {
           $result->properties[$prop][] = $value;
         }
       }
@@ -197,8 +126,92 @@ class MicrodataPhpParser {
       return $result;
     }
 
+}
+
+/**
+ * Extend the DOMElement class with the Microdata API functions.
+ */
+class MicrodataPhpDomElement extends DOMElement {
+  
+  public function itemScope() {
+    return $this->hasAttribute('itemscope');
+  }
+
+  public function itemType() {
+    $itemtype = $this->getAttribute('itemtype');
+    if (!empty($itemtype)) {
+      return $this->tokenList($itemtype);
+    }
+    // Return NULL instead of the empty string returned by getAttributes so we
+    // can use the function for boolean tests.
+    return NULL;
+  }
+
+  public function itemId() {
+    $itemid = $this->getAttribute('itemid');
+    if (!empty($itemid)) {
+      return $itemid;
+    }
+    // Return NULL instead of the empty string returned by getAttributes so we
+    // can use the function for boolean tests.
+    return NULL;
+  }
+
+  public function itemProp() {
+    $itemprop = $this->getAttribute('itemprop');
+    if (!empty($itemprop)) {
+      return $this->tokenList($itemprop);
+    }
+    return array();
+  }
+
+  public function itemRef() {
+    $itemref = $this->getAttribute('itemref');
+    if (!empty($itemref)) {
+      return $this->tokenList($itemref);
+    }
+    return array();
+  }
+
+  public function itemValue() {
+    $itemprop = $this->itemProp();
+    if (empty($itemprop))
+      return null;
+    if ($this->itemScope()) {
+      return $this;
+    }
+    switch (strtoupper($this->tagName)) {
+      case 'META':
+        return $this->getAttribute('content');
+      case 'AUDIO':
+      case 'EMBED':
+      case 'IFRAME':
+      case 'IMG':
+      case 'SOURCE':
+      case 'TRACK':
+      case 'VIDEO':
+        // @todo Should this test that the URL resolves?
+        return $this->getAttribute('src');
+      case 'A':
+      case 'AREA':
+      case 'LINK':
+        // @todo Should this test that the URL resolves?
+        return $this->getAttribute('href');
+      case 'OBJECT':
+        // @todo Should this test that the URL resolves?
+        return $this->getAttribute('data');
+      case 'TIME':
+        $datetime = $this->getAttribute('datetime');
+        if (!empty($datetime))
+          return $datetime;
+      default:
+        return $this->textContent;
+    }
+  }
+
   protected function tokenList($string) {
     return explode(' ', trim($string));
   }
 }
+
 ?>
