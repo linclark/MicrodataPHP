@@ -3,23 +3,22 @@
 /**
  * Defines a parser for extracting microdata items from HTML.
  */
-class MicrodataPhpParser {
+class MicrodataPhp {
   protected $url;
   public $xpath;
 
   public function __construct($url) {
-    $this->url = $url;
-    $dom = new DOMDocument($url);
-    // Use a custom class for DOMElements so that we can use Microdata DOM API
-    // functions on them.
+    $dom = new DOMDocument();
+    // Extend DOMElements class so that we can add Microdata DOM API functions.
     $dom->registerNodeClass('DOMElement', 'MicrodataPhpDomElement');
     $dom->preserveWhiteSpace = false;
-    @$dom->loadHTMLFile($this->url);
+    @$dom->loadHTMLFile($url);
+
+    $this->url = $url;
     $this->xpath = new DOMXPath($dom);
   }
 
-  public function json() {
-
+  public function php_array() {
     $result = new stdClass();
     $result->items = array();
     foreach ($this->items() as $item) {
@@ -27,7 +26,7 @@ class MicrodataPhpParser {
         array_push($result->items, $this->getObject($item, array()));
       }
     }
-    dpm($result->items);
+    return $result->items;
   }
 
   public function items(array $types = array()) {
