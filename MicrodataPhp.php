@@ -1,4 +1,14 @@
 <?php
+/**
+ * MicrodataPHP
+ * http://github.com/linclark/MicrodataPHP
+ * Copyright (c) 2011 Lin Clark
+ * Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
+ *
+ * Based on MicrodataJS
+ * http://gitorious.org/microdatajs/microdatajs
+ * Copyright (c) 2009-2011 Philip Jgenstedt
+ */
 
 /**
  * Defines a parser for extracting microdata items from HTML.
