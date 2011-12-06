@@ -14,133 +14,74 @@
  * Defines a parser for extracting microdata items from HTML.
  */
 class MicrodataPhp {
-  public $xpath;
+  public $dom;
 
   public function __construct($url) {
-    $dom = new DOMDocument();
-    // Extend DOMElements class so that we can add Microdata DOM API functions.
+    $dom = new MicrodataPhpDOMDocument($url);
+    $dom->registerNodeClass('DOMDocument', 'MicrodataPhpDomDocument');
     $dom->registerNodeClass('DOMElement', 'MicrodataPhpDomElement');
     $dom->preserveWhiteSpace = false;
     @$dom->loadHTMLFile($url);
 
-    $this->xpath = new DOMXPath($dom);
+    $this->dom = $dom;
   }
 
-  public function php_array() {
   public function phpArray() {
     $result = new stdClass();
     $result->items = array();
-    foreach ($this->items() as $item) {
-      if (!$item->hasAttribute('itemprop')) {
-        array_push($result->items, $this->getObject($item, array()));
-      }
+    foreach ($this->dom->getItems() as $item) {
+      array_push($result->items, $this->getObject($item, array()));
     }
     return $result->items;
   }
 
-  public function items(array $types = array()) {
-    // Return top level items.
-    return $this->xpath->query('//*[@itemscope]');
-  }
-
-  public function properties($root) {
-    $props = array();
-
-    if ($root->itemScope()) {
-      $toTraverse = array($root);
-
-      foreach ($root->itemRef() as $itemref) {
-        //@todo Implement itemref support.
-      }
-      while (count($toTraverse)) {
-        $this->traverse($toTraverse[0], $toTraverse, $props, $root);
-      }
-    }
-
-    return $props;
-  }
-
   /**
-   * Helper functions.
+   * Helper function.
    *
    * In MicrodataJS, this is handled using a closure. PHP 5.3 allows closures,
    * but cannot use $this within the closure. PHP 5.4 reintroduces support for
    * $this. When PHP 5.3/5.4 are more widely supported on shared hosting,
-   * these functions could be handled with closures.
+   * this function could be handled with a closure.
    */
-
-  /**
-   * Traverse the tree.
-   */
-  protected function traverse($node, &$toTraverse, &$props, $root) {
-    foreach ($toTraverse as $i => $elem)  {
-      if ($elem->isSameNode($node)){
-        unset($toTraverse[$i]);
-      }
-    }
-    if (!$root->isSameNode($node)) {
-      $names = $node->itemProp();
-      if (count($names)) {
-        //@todo Add support for property name filtering.
-        $props[] = $node;
-      }
-      if ($node->itemScope()) {
-        return;
-      }
-    }
-    if (isset($node)) {
-      // We use an xpath expression to get children instead of childNodes
-      // because childNodes returns DOMText children as well, which breaks on
-      // the call to getAttributes() in itemProp().
-      $children = $this->xpath->query($node->getNodePath() . '/*');
-      foreach ($children as $child) {
-        $this->traverse($child, $toTraverse, $props, $root);
-      }
-    }
-  }
-
-  function getObject($item, $memory) {
-      $result = new stdClass();
-      $result->properties = array();
+  public function getObject($item, $memory) {
+    $result = new stdClass();
+    $result->properties = array();
   
-      // Add itemtype.
-      if ($itemtype = $item->itemType()) {
-        $result->type = $itemtype;
-      }
-      // Add itemid. 
-      if ($itemid = $item->itemid()) {
-        $result->id = $itemid;
-      }
-      // Add properties.
-      foreach ($this->properties($item) as $elem) {
-        if ($elem->itemScope()) {
-          if (in_array($elem, $memory)) {
-            $value = 'ERROR';
-          }
-          else {
-            $memory[] = $item;
-            $value = $this->getObject($elem, $memory);
-            array_pop($memory);
-          }
+    // Add itemtype.
+    if ($itemtype = $item->itemType()) {
+      $result->type = $itemtype;
+    }
+    // Add itemid. 
+    if ($itemid = $item->itemid()) {
+      $result->id = $itemid;
+    }
+    // Add properties.
+    foreach ($item->properties() as $elem) {
+      if ($elem->itemScope()) {
+        if (in_array($elem, $memory)) {
+          $value = 'ERROR';
         }
         else {
-          $value = $elem->itemValue();
-        }
-        foreach ($elem->itemProp() as $prop) {
-          $result->properties[$prop][] = $value;
+          $memory[] = $item;
+          $value = $this->getObject($elem, $memory);
+          array_pop($memory);
         }
       }
-
-      return $result;
+      else {
+        $value = $elem->itemValue();
+      }
+      foreach ($elem->itemProp() as $prop) {
+        $result->properties[$prop][] = $value;
+      }
     }
+
+    return $result;
+  }
 
 }
 
-/**
- * Extend the DOMElement class with the Microdata API functions.
- */
 class MicrodataPhpDomElement extends DOMElement {
-  
+
   public function itemScope() {
     return $this->hasAttribute('itemscope');
   }
@@ -181,6 +122,23 @@ class MicrodataPhpDomElement extends DOMElement {
     return array();
   }
 
+  public function properties() {
+    $props = array();
+
+    if ($this->itemScope()) {
+      $toTraverse = array($this);
+
+      foreach ($this->itemRef() as $itemref) {
+        //@todo Implement itemref support.
+      }
+      while (count($toTraverse)) {
+        $this->traverse($toTraverse[0], $toTraverse, $props, $this);
+      }
+    }
+
+    return $props;
+  }
+
   public function itemValue() {
     $itemprop = $this->itemProp();
     if (empty($itemprop))
@@ -219,6 +177,52 @@ class MicrodataPhpDomElement extends DOMElement {
 
   protected function tokenList($string) {
     return explode(' ', trim($string));
+  }
+
+  /**
+   * Traverse the tree.
+   * 
+   * In MicrodataJS, this is handled using a closure.
+   * See comment for MicrodataPhp:getObject() for an explanation of closure use
+   * in this library.
+   */
+  protected function traverse($node, &$toTraverse, &$props, $root) {
+    foreach ($toTraverse as $i => $elem)  {
+      if ($elem->isSameNode($node)){
+        unset($toTraverse[$i]);
+      }
+    }
+    if (!$root->isSameNode($node)) {
+      $names = $node->itemProp();
+      if (count($names)) {
+        //@todo Add support for property name filtering.
+        $props[] = $node;
+      }
+      if ($node->itemScope()) {
+        return;
+      }
+    }
+    if (isset($node)) {
+      // An xpath expression is used to get children instead of childNodes
+      // because childNodes contains DOMText children as well, which breaks on
+      // the call to getAttributes() in itemProp().
+      $children = $this->ownerDocument->xpath()->query($node->getNodePath() . '/*');
+      foreach ($children as $child) {
+        $this->traverse($child, $toTraverse, $props, $root);
+      }
+    }
+  }
+
+}
+
+class MicrodataPhpDOMDocument extends DOMDocument {
+  public function getItems() {
+    // Return top level items.
+    return $this->xpath()->query('//*[@itemscope and not(@itemprop)]');
+  }
+
+  public function xpath() {
+    return new DOMXPath($this);
   }
 }
 
