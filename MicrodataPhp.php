@@ -66,7 +66,7 @@ class MicrodataPhp {
    * $this. When PHP 5.3/5.4 are more widely supported on shared hosting,
    * this function could be handled with a closure.
    */
-  public function getObject($item, $memory) {
+  protected function getObject($item, $memory) {
     $result = new stdClass();
     $result->properties = array();
   
