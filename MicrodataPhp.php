@@ -7,14 +7,13 @@
  *
  * Based on MicrodataJS
  * http://gitorious.org/microdatajs/microdatajs
- * Copyright (c) 2009-2011 Philip JÂŠgenstedt
+ * Copyright (c) 2009-2011 Philip JŠgenstedt
  */
 
 /**
  * Defines a parser for extracting microdata items from HTML.
  */
 class MicrodataPhp {
-  protected $url;
   public $xpath;
 
   public function __construct($url) {
@@ -24,7 +23,6 @@ class MicrodataPhp {
     $dom->preserveWhiteSpace = false;
     @$dom->loadHTMLFile($url);
 
-    $this->url = $url;
     $this->xpath = new DOMXPath($dom);
   }
 
