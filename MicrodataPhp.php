@@ -14,7 +14,7 @@
  * Extracts microdata from HTML.
  *
  * Currently supported formats:
- *   - PHP array
+ *   - PHP object
  */
 class MicrodataPhp {
   public $dom;
@@ -36,9 +36,11 @@ class MicrodataPhp {
   }
 
   /**
-   * Retrieve a PHP array of top level microdata items and their properties.
+   * Retrieve microdata as a PHP object.
    *
-   * @return An array of top level item objects with the following properties:
+   * @return
+   *   An object with an 'items' property, which is an array of top level
+   *   microdata items as objects with the following properties:
    *   - type: An array of itemtype(s) for the item, if specified.
    *   - id: The itemid of the item, if specified.
    *   - properties: An array of itemprops. Each itemprop is keyed by the
@@ -49,7 +51,7 @@ class MicrodataPhp {
    *   parsing to one section of the document. Consider adding such
    *   functionality.
    */
-  public function arr() {
+  public function obj() {
     $result = new stdClass();
     $result->items = array();
     foreach ($this->dom->getItems() as $item) {
