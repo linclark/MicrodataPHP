@@ -27,8 +27,8 @@ class MicrodataPhp {
    */
   public function __construct($url) {
     $dom = new MicrodataPhpDOMDocument($url);
-    $dom->registerNodeClass('DOMDocument', 'MicrodataPhpDomDocument');
-    $dom->registerNodeClass('DOMElement', 'MicrodataPhpDomElement');
+    $dom->registerNodeClass('DOMDocument', 'MicrodataPhpDOMDocument');
+    $dom->registerNodeClass('DOMElement', 'MicrodataPhpDOMElement');
     $dom->preserveWhiteSpace = false;
     @$dom->loadHTMLFile($url);
 
@@ -49,7 +49,7 @@ class MicrodataPhp {
    *   parsing to one section of the document. Consider adding such
    *   functionality.
    */
-  public function phpArray() {
+  public function arr() {
     $result = new stdClass();
     $result->items = array();
     foreach ($this->dom->getItems() as $item) {
@@ -103,10 +103,10 @@ class MicrodataPhp {
 
 }
 
-class MicrodataPhpDomElement extends DOMElement {
 /**
  * Extend the DOMElement class with the Microdata API functions.
  */
+class MicrodataPhpDOMElement extends DOMElement {
 
   /**
    * Determine whether the itemscope attribute is present on this element.
