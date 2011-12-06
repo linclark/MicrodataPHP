@@ -15,6 +15,7 @@
  *
  * Currently supported formats:
  *   - PHP object
+ *   - JSON
  */
 class MicrodataPhp {
   public $dom;
@@ -58,6 +59,19 @@ class MicrodataPhp {
       array_push($result->items, $this->getObject($item, array()));
     }
     return $result;
+  }
+
+  /**
+   * Retrieve microdata in JSON format.
+   *
+   * @return
+   *   See obj().
+   *
+   * @todo MicrodataJS allows callers to pass in a function to format the JSON.
+   * Consider adding such functionality.
+   */
+  public function json() {
+    return json_encode($this->obj());
   }
 
   /**
