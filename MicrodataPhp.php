@@ -11,11 +11,20 @@
  */
 
 /**
- * Defines a parser for extracting microdata items from HTML.
+ * Extracts microdata from HTML.
+ *
+ * Currently supported formats:
+ *   - PHP array
  */
 class MicrodataPhp {
   public $dom;
 
+  /**
+   * Constructs a MicrodataPhp object.
+   *
+   * @param $url
+   *   The url of the page to be parsed.
+   */
   public function __construct($url) {
     $dom = new MicrodataPhpDOMDocument($url);
     $dom->registerNodeClass('DOMDocument', 'MicrodataPhpDomDocument');
@@ -26,6 +35,20 @@ class MicrodataPhp {
     $this->dom = $dom;
   }
 
+  /**
+   * Retrieve a PHP array of top level microdata items and their properties.
+   *
+   * @return An array of top level item objects with the following properties:
+   *   - type: An array of itemtype(s) for the item, if specified.
+   *   - id: The itemid of the item, if specified.
+   *   - properties: An array of itemprops. Each itemprop is keyed by the
+   *     itemprop name and has its own array of values. Values can be strings
+   *     or can be other items, represented as objects.
+   *
+   * @todo MicrodataJS allows callers to pass in a selector for limiting the
+   *   parsing to one section of the document. Consider adding such
+   *   functionality.
+   */
   public function phpArray() {
     $result = new stdClass();
     $result->items = array();
@@ -81,11 +104,26 @@ class MicrodataPhp {
 }
 
 class MicrodataPhpDomElement extends DOMElement {
+/**
+ * Extend the DOMElement class with the Microdata API functions.
+ */
 
+  /**
+   * Determine whether the itemscope attribute is present on this element.
+   *
+   * @return
+   *   boolean TRUE if this is an item, FALSE if it is not.
+   */
   public function itemScope() {
     return $this->hasAttribute('itemscope');
   }
 
+  /**
+   * Retrieve this item's itemtypes.
+   *
+   * @return
+   *   An array of itemtype tokens.
+   */
   public function itemType() {
     $itemtype = $this->getAttribute('itemtype');
     if (!empty($itemtype)) {
@@ -96,6 +134,12 @@ class MicrodataPhpDomElement extends DOMElement {
     return NULL;
   }
 
+  /**
+   * Retrieve this item's itemid.
+   *
+   * @return
+   *   A string with the itemid.
+   */
   public function itemId() {
     $itemid = $this->getAttribute('itemid');
     if (!empty($itemid)) {
@@ -106,6 +150,12 @@ class MicrodataPhpDomElement extends DOMElement {
     return NULL;
   }
 
+  /**
+   * Retrieve this item's itemprops.
+   *
+   * @return
+   *   An array of itemprop tokens.
+   */
   public function itemProp() {
     $itemprop = $this->getAttribute('itemprop');
     if (!empty($itemprop)) {
@@ -114,6 +164,12 @@ class MicrodataPhpDomElement extends DOMElement {
     return array();
   }
 
+  /**
+   * Retrieve the ids of other items which this item references.
+   *
+   * @return
+   *   An array of ids as contained in the itemref attribute.
+   */
   public function itemRef() {
     $itemref = $this->getAttribute('itemref');
     if (!empty($itemref)) {
@@ -122,6 +178,13 @@ class MicrodataPhpDomElement extends DOMElement {
     return array();
   }
 
+  /**
+   * Retrieve the properties
+   *
+   * @return
+   *   An array of MicrodataPhpDOMElements which are properties of this
+   *   element.
+   */
   public function properties() {
     $props = array();
 
@@ -139,6 +202,13 @@ class MicrodataPhpDomElement extends DOMElement {
     return $props;
   }
 
+  /**
+   * Retrieve the element's value, determined by the element type.
+   *
+   * @return
+   *   The string value if the element is not an item, or $this if it is
+   *   an item.
+   */
   public function itemValue() {
     $itemprop = $this->itemProp();
     if (empty($itemprop))
@@ -175,6 +245,15 @@ class MicrodataPhpDomElement extends DOMElement {
     }
   }
 
+  /**
+   * Parse space-separated tokens into an array.
+   *
+   * @param string $string
+   *   A space-separated list of tokens.
+   *
+   * @return array
+   *   An array of tokens.
+   */
   protected function tokenList($string) {
     return explode(' ', trim($string));
   }
@@ -215,12 +294,29 @@ class MicrodataPhpDomElement extends DOMElement {
 
 }
 
+/**
+ * Extend the DOMDocument class with the Microdata API functions.
+ */
 class MicrodataPhpDOMDocument extends DOMDocument {
+  /**
+   * Retrieves a list of microdata items.
+   *
+   * @return
+   *   A DOMNodeList containing all top level microdata items.
+   *
+   * @todo Allow restriction by type string.
+   */
   public function getItems() {
     // Return top level items.
     return $this->xpath()->query('//*[@itemscope and not(@itemprop)]');
   }
 
+  /**
+   * Creates a DOMXPath to query this document.
+   *
+   * @return
+   *   DOMXPath object.
+   */
   public function xpath() {
     return new DOMXPath($this);
   }
