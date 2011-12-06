@@ -55,7 +55,7 @@ class MicrodataPhp {
     foreach ($this->dom->getItems() as $item) {
       array_push($result->items, $this->getObject($item, array()));
     }
-    return $result->items;
+    return $result;
   }
 
   /**
