@@ -27,6 +27,7 @@ class MicrodataPhp {
   }
 
   public function php_array() {
+  public function phpArray() {
     $result = new stdClass();
     $result->items = array();
     foreach ($this->items() as $item) {
