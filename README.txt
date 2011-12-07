@@ -12,3 +12,8 @@ Example use:
   $data = $md->obj();
   print $data->items[0]->properties['name'][0];   //prints 'Cool Hand Luke'
   print $data->items[0]->properties['genre'][0];  //prints 'prison drama'
+  
+REQUIREMENTS
+============
+
+PHP 5.2 or higher
