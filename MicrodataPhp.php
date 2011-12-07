@@ -252,6 +252,8 @@ class MicrodataPhpDOMElement extends DOMElement {
       case 'OBJECT':
         // @todo Should this test that the URL resolves?
         return $this->getAttribute('data');
+      case 'DATA':
+        return $this->getAttribute('value');
       case 'TIME':
         $datetime = $this->getAttribute('datetime');
         if (!empty($datetime))
