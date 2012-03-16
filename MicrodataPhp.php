@@ -7,7 +7,7 @@
  *
  * Based on MicrodataJS
  * http://gitorious.org/microdatajs/microdatajs
- * Copyright (c) 2009-2011 Philip J�genstedt
+ * Copyright (c) 2009-2011 Philip Jägenstedt
  */
 
 /**
