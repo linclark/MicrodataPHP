@@ -7,7 +7,7 @@
  *
  * Based on MicrodataJS
  * http://gitorious.org/microdatajs/microdatajs
- * Copyright (c) 2009-2011 Philip JŠgenstedt
+ * Copyright (c) 2009-2011 Philip JÃ¤genstedt
  */
 
 /**
@@ -208,7 +208,10 @@ class MicrodataPhpDOMElement extends DOMElement {
       $toTraverse = array($this);
 
       foreach ($this->itemRef() as $itemref) {
-        //@todo Implement itemref support.
+        $children = $this->ownerDocument->xpath()->query('//*[@id="'.$itemref.'"]');
+        foreach($children as $child) {
+          $this->traverse($child, $toTraverse, $props, $this);
+        }
       }
       while (count($toTraverse)) {
         $this->traverse($toTraverse[0], $toTraverse, $props, $this);
