@@ -16,4 +16,4 @@ Example use:
 REQUIREMENTS
 ============
 
-PHP 5.2 or higher
+PHP 5.2+
