@@ -27,7 +27,7 @@ class MicrodataPhp {
    *   The url of the page to be parsed.
    */
   public function __construct($url) {
-    $dom = new MicrodataPhpDOMDocument($url);
+    $dom = new MicrodataPhpDOMDocument();
     $dom->registerNodeClass('DOMDocument', 'MicrodataPhpDOMDocument');
     $dom->registerNodeClass('DOMElement', 'MicrodataPhpDOMElement');
     $dom->preserveWhiteSpace = false;
