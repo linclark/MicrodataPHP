@@ -23,15 +23,35 @@ class MicrodataPhp {
   /**
    * Constructs a MicrodataPhp object.
    *
-   * @param $url
-   *   The url of the page to be parsed.
+   * @param array|string $config
+   *   The configuration options used in setting up the MicrodataPhpDOMDocument.
+   *   Options include:
+   *   - url: The url of the page to fetch.
+   *   - html: Alternatively, an HTML string can be used to set up the DOM.
+   *
+   * @throws \Exception
    */
-  public function __construct($url) {
+  public function __construct($config) {
+    // Convert a string to a config object for backwards compatibility.
+    if (is_string($config)) {
+      $config = array('url' => $config);
+    }
+
     $dom = new MicrodataPhpDOMDocument();
     $dom->registerNodeClass('DOMDocument', 'MicrodataPhpDOMDocument');
     $dom->registerNodeClass('DOMElement', 'MicrodataPhpDOMElement');
     $dom->preserveWhiteSpace = false;
-    @$dom->loadHTMLFile($url);
+
+    // Prepare the DOM using either the URL or HTML string.
+    if (isset($config['url'])) {
+      @$dom->loadHTMLFile($config['url']);
+    }
+    else if (isset($config['html'])) {
+      @$dom->loadHTML($config['html']);
+    }
+    else {
+      throw new \Exception("Either a URL or an HTML string must be passed into the constructor.");
+    }
 
     $this->dom = $dom;
   }
