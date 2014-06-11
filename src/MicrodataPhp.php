@@ -75,7 +75,7 @@ class MicrodataPhp {
    *   functionality.
    */
   public function obj() {
-    $result = new stdClass();
+    $result = new \stdClass();
     $result->items = array();
     foreach ($this->dom->getItems() as $item) {
       array_push($result->items, $this->getObject($item, array()));
@@ -105,7 +105,7 @@ class MicrodataPhp {
    * this function could be handled with a closure.
    */
   protected function getObject($item, $memory) {
-    $result = new stdClass();
+    $result = new \stdClass();
     $result->properties = array();
   
     // Add itemtype.
@@ -140,5 +140,3 @@ class MicrodataPhp {
   }
 
 }
-
-?>
