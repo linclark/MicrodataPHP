@@ -1,4 +1,4 @@
-MicrodataPHP
+MicrodataPHP [![Build Status](https://travis-ci.org/linclark/MicrodataPHP.svg?branch=2.0.x)](https://travis-ci.org/linclark/MicrodataPHP)
 ============
 
 Microdata is a syntax for embedding machine-readable metadata in HTML.
