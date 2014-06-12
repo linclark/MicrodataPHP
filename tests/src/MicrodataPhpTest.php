@@ -16,13 +16,13 @@ class MicrodataPhpTest extends \PHPUnit_Framework_TestCase {
    * Tests parsing a sample html document.
    */
   public function testParseMicroData() {
-    $config = ['html' => file_get_contents(__DIR__ . '/../data/ironworks.html')];
+    $config = ['html' => file_get_contents(__DIR__ . '/../data/person.html')];
     $microdata = new MicrodataPhp($config);
     $data = $microdata->obj();
 
     $name = $data->items[0]->properties['name'][0];
 
-    $this->assertEquals($name, "Iron Works BBQ", "The name matches.");
+    $this->assertEquals($name, "Jane Doe", "The name matches.");
   }
 
 }
