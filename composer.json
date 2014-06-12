@@ -1,5 +1,5 @@
 {
-  "name": "linclark/MicrodataPHP",
+  "name": "linclark/microdata-php",
   "description": "Extracts microdata from HTML using PHP.",
   "autoload": {
     "psr-4": {
