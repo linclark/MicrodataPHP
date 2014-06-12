@@ -25,4 +25,11 @@ class MicrodataPhpTest extends \PHPUnit_Framework_TestCase {
     $this->assertEquals($name, "Jane Doe", "The name matches.");
   }
 
+  /**
+   * @expectedException \InvalidArgumentException
+   */
+  public function testConstructorNoUrlOrHtml() {
+    $config = array();
+    new MicrodataPhp($config);
+  }
 }
