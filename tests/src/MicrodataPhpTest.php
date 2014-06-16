@@ -16,7 +16,7 @@ class MicrodataPhpTest extends \PHPUnit_Framework_TestCase {
    * Tests parsing a sample html document.
    */
   public function testParseMicroData() {
-    $config = array('html' => file_get_contents(__DIR__ . '/../data/person.html'));
+    $config = $this->getConfig('person.html');
     $microdata = new MicrodataPhp($config);
     $data = $microdata->obj();
 
@@ -31,5 +31,9 @@ class MicrodataPhpTest extends \PHPUnit_Framework_TestCase {
   public function testConstructorNoUrlOrHtml() {
     $config = array();
     new MicrodataPhp($config);
+  }
+
+  protected function getConfig($file) {
+    return array('html' => file_get_contents(__DIR__  . '/../data/' . $file));
   }
 }
