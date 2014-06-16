@@ -26,7 +26,7 @@ print $data->items[0]->properties['hiringOrganization'][0]->properties['name'][0
 
 Requirements
 ============
-Autoloading (e.g. the autoloader provided by [Composer](https://getcomposer.org/))
-PHP 5.3+
+- Autoloading (e.g. the autoloader provided by [Composer](https://getcomposer.org/))
+- PHP 5.3+
 
 Check out the 1.x branch for older setups.
