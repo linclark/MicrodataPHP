@@ -25,6 +25,17 @@ class MicrodataPhpTest extends \PHPUnit_Framework_TestCase {
     $this->assertEquals($name, "Jane Doe", "The name matches.");
   }
 
+  public function testItemtype() {
+    $config = $this->getConfig('itemtype.html');
+    $microdata = new MicrodataPhp($config);
+    $data = $microdata->obj();
+
+    $type = $data->items[0]->type;
+
+    $this->assertCount(2, $type, 'Incorrect number of itemtypes found.');
+    $this->assertTrue(in_array('http://schema.org/ComedyEvent', $type) && in_array('http://schema.org/DanceEvent', $type), 'Incorrect types extracted.');
+  }
+
   /**
    * @expectedException \InvalidArgumentException
    */
