@@ -36,6 +36,17 @@ class MicrodataPhpTest extends \PHPUnit_Framework_TestCase {
     $this->assertTrue(in_array('http://schema.org/ComedyEvent', $type) && in_array('http://schema.org/DanceEvent', $type), 'Incorrect types extracted.');
   }
 
+  public function testNestedItem() {
+    $config = $this->getConfig('nested_item.html');
+    $microdata = new MicrodataPhp($config);
+    $data = $microdata->obj();
+
+    $address = $data->items[0]->properties['address'][0];
+
+    $this->assertTrue(is_object($address), 'Nested item should be returned as an object.');
+    $this->assertEqual($address->properties['addressCountry'][0], "Germany", 'addressCountry property of nested item should be Germany.');
+  }
+
   /**
    * @expectedException \InvalidArgumentException
    */
