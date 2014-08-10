@@ -41,7 +41,7 @@ class MicrodataPhpTest extends \PHPUnit_Framework_TestCase {
     $microdata = new MicrodataPhp($config);
     $data = $microdata->obj();
 
-    $address = $data->items[0]->properties['address'][0];
+    $address = $data->items[0]->properties['location'][0]->properties['address'][0];
 
     $this->assertTrue(is_object($address), 'Nested item should be returned as an object.');
     $this->assertEquals($address->properties['addressCountry'][0], "Germany", 'addressCountry property of nested item should be Germany.');

@@ -1,4 +1,14 @@
 <?php
+/**
+ * MicrodataPHP
+ * http://github.com/linclark/MicrodataPHP
+ * Copyright (c) 2011 Lin Clark
+ * Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
+ *
+ * Based on MicrodataJS
+ * http://gitorious.org/microdatajs/microdatajs
+ * Copyright (c) 2009-2011 Philip Jägenstedt
+ */
 
 namespace linclark\MicrodataPHP;
 
@@ -97,7 +107,7 @@ class MicrodataPhp {
   protected function getObject($item, $memory) {
     $result = new \stdClass();
     $result->properties = array();
-  
+
     // Add itemtype.
     if ($itemtype = $item->itemType()) {
       $result->type = $itemtype;
@@ -109,10 +119,16 @@ class MicrodataPhp {
     // Add properties.
     foreach ($item->properties() as $elem) {
       if ($elem->itemScope()) {
-        if (in_array($elem, $memory)) {
-          $value = 'ERROR';
+        // Cannot use in_array() for comparison when values are arrays, so
+        // iterate and check for equality with each item in memory.
+        foreach ($memory as $memory_item) {
+          if ($memory_item === $elem) {
+            $value = 'ERROR';
+          }
         }
-        else {
+        // If the item is not in memory, there are no cycles, and thus no error.
+        // Recurse into the item to build out its properties.
+        if (!isset($value)) {
           $memory[] = $item;
           $value = $this->getObject($elem, $memory);
           array_pop($memory);
