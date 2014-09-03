@@ -61,7 +61,7 @@ class MicrodataPhp {
   /**
    * Retrieve microdata as a PHP object.
    *
-   * @return
+   * @return object
    *   An object with an 'items' property, which is an array of top level
    *   microdata items as objects with the following properties:
    *   - type: An array of itemtype(s) for the item, if specified.
@@ -86,7 +86,7 @@ class MicrodataPhp {
   /**
    * Retrieve microdata in JSON format.
    *
-   * @return
+   * @return string
    *   See obj().
    *
    * @todo MicrodataJS allows callers to pass in a function to format the JSON.

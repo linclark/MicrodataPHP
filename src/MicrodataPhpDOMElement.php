@@ -10,8 +10,8 @@ class MicrodataPhpDOMElement extends \DOMElement {
   /**
    * Determine whether the itemscope attribute is present on this element.
    *
-   * @return
-   *   boolean TRUE if this is an item, FALSE if it is not.
+   * @return bool
+   *   TRUE if this is an item, FALSE if it is not.
    */
   public function itemScope() {
     return $this->hasAttribute('itemscope');
@@ -20,7 +20,7 @@ class MicrodataPhpDOMElement extends \DOMElement {
   /**
    * Retrieve this item's itemtypes.
    *
-   * @return
+   * @return array
    *   An array of itemtype tokens.
    */
   public function itemType() {
@@ -36,7 +36,7 @@ class MicrodataPhpDOMElement extends \DOMElement {
   /**
    * Retrieve this item's itemid.
    *
-   * @return
+   * @return string
    *   A string with the itemid.
    */
   public function itemId() {
@@ -52,7 +52,7 @@ class MicrodataPhpDOMElement extends \DOMElement {
   /**
    * Retrieve this item's itemprops.
    *
-   * @return
+   * @return array
    *   An array of itemprop tokens.
    */
   public function itemProp() {
@@ -66,7 +66,7 @@ class MicrodataPhpDOMElement extends \DOMElement {
   /**
    * Retrieve the ids of other items which this item references.
    *
-   * @return
+   * @return array
    *   An array of ids as contained in the itemref attribute.
    */
   public function itemRef() {
@@ -80,7 +80,7 @@ class MicrodataPhpDOMElement extends \DOMElement {
   /**
    * Retrieve the properties
    *
-   * @return
+   * @return array
    *   An array of MicrodataPhpDOMElements which are properties of this
    *   element.
    */
@@ -107,7 +107,7 @@ class MicrodataPhpDOMElement extends \DOMElement {
   /**
    * Retrieve the element's value, determined by the element type.
    *
-   * @return
+   * @return string
    *   The string value if the element is not an item, or $this if it is
    *   an item.
    */

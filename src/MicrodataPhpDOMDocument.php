@@ -9,7 +9,7 @@ class MicrodataPhpDOMDocument extends \DOMDocument {
   /**
    * Retrieves a list of microdata items.
    *
-   * @return
+   * @return DOMNodeList
    *   A DOMNodeList containing all top level microdata items.
    *
    * @todo Allow restriction by type string.
@@ -22,7 +22,7 @@ class MicrodataPhpDOMDocument extends \DOMDocument {
   /**
    * Creates a DOMXPath to query this document.
    *
-   * @return
+   * @return DOMXPath
    *   DOMXPath object.
    */
   public function xpath() {
