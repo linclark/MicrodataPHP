@@ -140,8 +140,9 @@ class MicrodataPhp {
       foreach ($elem->itemProp() as $prop) {
         $result->properties[$prop][] = $value;
       }
-    }
 
+      $value = NULL;
+    }
     return $result;
   }
 
