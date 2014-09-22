@@ -95,6 +95,17 @@ class MicrodataPhp {
   public function json() {
     return json_encode($this->obj());
   }
+  
+  /**
+   * Retrieve microdata as an PHP array
+   *
+   * @return array
+   *   See json().
+   *
+   */
+  public function array() {
+    return json_decode($this->json(),true);
+  }
 
   /**
    * Helper function.
