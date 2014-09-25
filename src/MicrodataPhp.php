@@ -103,7 +103,7 @@ class MicrodataPhp {
    *   See json().
    *
    */
-  public function array() {
+  public function toArray() {
     return json_decode($this->json(),true);
   }
 
