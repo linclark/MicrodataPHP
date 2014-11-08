@@ -159,7 +159,7 @@ class MicrodataPhpDOMElement extends \DOMElement {
    *   An array of tokens.
    */
   protected function tokenList($string) {
-    return explode(' ', trim($string));
+    return preg_split('/\s+/', trim($string));
   }
 
   /**
