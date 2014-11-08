@@ -6,6 +6,9 @@ namespace linclark\MicrodataPHP;
  * Extend the DOMDocument class with the Microdata API functions.
  */
 class MicrodataPhpDOMDocument extends \DOMDocument {
+  /** @var \DOMXPath $xpath */
+  protected $xpath;
+
   /**
    * Retrieves a list of microdata items.
    *
@@ -26,6 +29,10 @@ class MicrodataPhpDOMDocument extends \DOMDocument {
    *   DOMXPath object.
    */
   public function xpath() {
-    return new \DOMXPath($this);
+    if (!isset($this->xpath)) {
+      $this->xpath = new \DOMXPath($this);
+    }
+
+    return $this->xpath;
   }
 }
