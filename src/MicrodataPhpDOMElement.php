@@ -25,12 +25,11 @@ class MicrodataPhpDOMElement extends \DOMElement {
    */
   public function itemType() {
     $itemtype = $this->getAttribute('itemtype');
-    if (!empty($itemtype)) {
-      return $this->tokenList($itemtype);
-    }
+
     // Return NULL instead of the empty string returned by getAttributes so we
     // can use the function for boolean tests.
-    return NULL;
+
+    return empty($itemtype) ? NULL : $this->tokenList($itemtype);
   }
 
   /**
@@ -41,12 +40,10 @@ class MicrodataPhpDOMElement extends \DOMElement {
    */
   public function itemId() {
     $itemid = $this->getAttribute('itemid');
-    if (!empty($itemid)) {
-      return $itemid;
-    }
+
     // Return NULL instead of the empty string returned by getAttributes so we
     // can use the function for boolean tests.
-    return NULL;
+    return empty($itemid) ? NULL : $itemid;
   }
 
   /**
@@ -57,10 +54,8 @@ class MicrodataPhpDOMElement extends \DOMElement {
    */
   public function itemProp() {
     $itemprop = $this->getAttribute('itemprop');
-    if (!empty($itemprop)) {
-      return $this->tokenList($itemprop);
-    }
-    return array();
+
+    return empty($itemprop) ? array() : $this->tokenList($itemprop);
   }
 
   /**
@@ -71,10 +66,8 @@ class MicrodataPhpDOMElement extends \DOMElement {
    */
   public function itemRef() {
     $itemref = $this->getAttribute('itemref');
-    if (!empty($itemref)) {
-      return $this->tokenList($itemref);
-    }
-    return array();
+
+    return empty($itemref) ? array() : $this->tokenList($itemref);
   }
 
   /**
@@ -113,14 +106,19 @@ class MicrodataPhpDOMElement extends \DOMElement {
    */
   public function itemValue() {
     $itemprop = $this->itemProp();
-    if (empty($itemprop))
+
+    if (empty($itemprop)) {
       return null;
+    }
+
     if ($this->itemScope()) {
       return $this;
     }
+
     switch (strtoupper($this->tagName)) {
       case 'META':
         return $this->getAttribute('content');
+
       case 'AUDIO':
       case 'EMBED':
       case 'IFRAME':
@@ -130,20 +128,25 @@ class MicrodataPhpDOMElement extends \DOMElement {
       case 'VIDEO':
         // @todo Should this test that the URL resolves?
         return $this->getAttribute('src');
+
       case 'A':
       case 'AREA':
       case 'LINK':
         // @todo Should this test that the URL resolves?
         return $this->getAttribute('href');
+
       case 'OBJECT':
         // @todo Should this test that the URL resolves?
         return $this->getAttribute('data');
+
       case 'DATA':
         return $this->getAttribute('value');
+
       case 'TIME':
         $datetime = $this->getAttribute('datetime');
-        if (!empty($datetime))
-          return $datetime;
+
+        return empty($datetime) ? $this->textContent : $datetime;
+
       default:
         return $this->textContent;
     }
