@@ -93,7 +93,7 @@ class MicrodataPhpDOMElement extends \DOMElement {
       foreach ($this->itemRef() as $itemref) {
         $children = $this->ownerDocument->xpath()->query('//*[@id="'.$itemref.'"]');
         foreach($children as $child) {
-          $this->traverse($child, $toTraverse, $props, $this);
+          $this->traverse($child, $toTraverse, $props, $this, true);
         }
       }
       while (count($toTraverse)) {
@@ -169,7 +169,7 @@ class MicrodataPhpDOMElement extends \DOMElement {
    * See comment for MicrodataPhp:getObject() for an explanation of closure use
    * in this library.
    */
-  protected function traverse($node, &$toTraverse, &$props, $root) {
+  protected function traverse($node, &$toTraverse, &$props, $root, $itemref = false) {
     foreach ($toTraverse as $i => $elem)  {
       if ($elem->isSameNode($node)){
         unset($toTraverse[$i]);
@@ -181,7 +181,7 @@ class MicrodataPhpDOMElement extends \DOMElement {
         //@todo Add support for property name filtering.
         $props[] = $node;
       }
-      if ($node->itemScope()) {
+      if (!$itemref && $node->itemScope()) {
         return;
       }
     }
