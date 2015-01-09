@@ -189,7 +189,7 @@ class MicrodataPhpDOMElement extends \DOMElement {
       // An xpath expression is used to get children instead of childNodes
       // because childNodes contains DOMText children as well, which breaks on
       // the call to getAttributes() in itemProp().
-      $children = $this->ownerDocument->xpath()->query($node->getNodePath() . '/*');
+      $children = $this->ownerDocument->xpath()->query('./*', $node);
       foreach ($children as $child) {
         $this->traverse($child, $toTraverse, $props, $root);
       }
