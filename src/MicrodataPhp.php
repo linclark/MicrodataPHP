@@ -44,16 +44,20 @@ class MicrodataPhp {
     $dom->registerNodeClass('DOMElement', 'linclark\MicrodataPHP\MicrodataPhpDOMElement');
     $dom->preserveWhiteSpace = false;
 
+    $errors = libxml_use_internal_errors(true);
+
     // Prepare the DOM using either the URL or HTML string.
     if (isset($config['url'])) {
-      @$dom->loadHTMLFile($config['url']);
+      $dom->loadHTMLFile($config['url']);
     }
     else if (isset($config['html'])) {
-      @$dom->loadHTML($config['html']);
+      $dom->loadHTML($config['html']);
     }
     else {
       throw new \InvalidArgumentException("Either a URL or an HTML string must be passed into the constructor.");
     }
+
+    libxml_use_internal_errors($errors);
 
     $this->dom = $dom;
   }
