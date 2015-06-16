@@ -48,6 +48,28 @@ class MicrodataPhpTest extends \PHPUnit_Framework_TestCase {
   }
 
   /**
+   * test recipe prep time
+   */
+  public function testRecipePrepTimeType() {
+    $config = $this->getConfig('recipe.html');
+    $microdata = new MicrodataPhp($config);
+    $data = $microdata->obj();
+
+    $this->assertEquals("PT15M", $data->items[0]->properties['prepTime'][0], 'recipe prepTime should be PT15M');
+  }
+
+  /**
+   * test recipe prep time
+   */
+  public function testRecipePrepTimeContentType() {
+    $config = $this->getConfig('recipeItempropContent.html');
+    $microdata = new MicrodataPhp($config);
+    $data = $microdata->obj();
+
+    $this->assertEquals("PT1H10M", $data->items[0]->properties['prepTime'][0], 'recipe prepTime should be PT1H10M');
+  }
+
+  /**
    * @expectedException \InvalidArgumentException
    */
   public function testConstructorNoUrlOrHtml() {
