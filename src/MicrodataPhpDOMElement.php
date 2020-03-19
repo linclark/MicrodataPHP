@@ -118,6 +118,9 @@ class MicrodataPhpDOMElement extends \DOMElement {
     if ($this->itemScope()) {
       return $this;
     }
+    if ($this->hasAttribute('content')) {
+      return $this->getAttribute('content');
+    }
     switch (strtoupper($this->tagName)) {
       case 'META':
         return $this->getAttribute('content');
